@@ -35,13 +35,15 @@ static const char * const describe_usage[] = {
 	NULL
 };
 
+#define DEFAULT_MAX_CANDIATES 10
+
 static int debug;	/* Display lots of verbose info */
 static int all;	/* Any valid ref can be used */
 static int tags;	/* Allow lightweight tags */
 static int longformat;
 static int first_parent;
 static int abbrev = -1; /* unspecified */
-static int max_candidates = 10;
+static int max_candidates = DEFAULT_MAX_CANDIATES;
 static struct hashmap names;
 static int have_util;
 static struct string_list patterns = STRING_LIST_INIT_NODUP;
@@ -568,8 +570,11 @@ int cmd_describe(int argc, const char **argv, const char *prefix)
 		OPT_BOOL(0, "long",       &longformat, N_("always use long format")),
 		OPT_BOOL(0, "first-parent", &first_parent, N_("only follow first parent")),
 		OPT__ABBREV(&abbrev),
-		OPT_SET_INT(0, "exact-match", &max_candidates,
-			    N_("only output exact matches"), 0),
+		OPT_SET_INT_F(0, "exact-match", &max_candidates,
+			      N_("only output exact matches"), 0, PARSE_OPT_NONEG),
+		OPT_SET_INT_F(0, "no-exact-match", &max_candidates,
+			      N_("only output exact matches"), DEFAULT_MAX_CANDIATES,
+			      PARSE_OPT_NONEG),
 		OPT_INTEGER(0, "candidates", &max_candidates,
 			    N_("consider <n> most recent tags (default: 10)")),
 		OPT_STRING_LIST(0, "match", &patterns, N_("pattern"),
