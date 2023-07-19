@@ -1623,6 +1623,23 @@ test_expect_success 'static check of bad command' '
 	test C = $(git cat-file commit HEAD^ | sed -ne \$p)
 '
 
+test_expect_success 'the first command cannot be a fixup' '
+	# When using `git rebase --edit-todo` to recover from this error, ensure
+	# that none of the original todo list is lost
+	rebase_setup_and_clean fixup-first &&
+	(
+		set_fake_editor &&
+		test_must_fail env FAKE_LINES="fixup 1 2 3 4 5" \
+			       git rebase -i --root 2>actual &&
+		grep "cannot .fixup. without a previous commit" actual &&
+		grep "You can fix this with .git rebase --edit-todo.." 	actual &&
+		grep -v "^#" .git/rebase-merge/git-rebase-todo >orig &&
+		test_must_fail git rebase --edit-todo &&
+		grep -v "^#" .git/rebase-merge/git-rebase-todo >actual &&
+		test_cmp orig actual
+	)
+'
+
 test_expect_success 'tabs and spaces are accepted in the todolist' '
 	rebase_setup_and_clean indented-comment &&
 	write_script add-indent.sh <<-\EOF &&
