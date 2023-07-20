@@ -137,5 +137,6 @@ test_perf_on_all "git worktree add ../temp && git worktree remove ../temp"
 test_perf_on_all 'echo >>a && git diff-index HEAD'
 test_perf_on_all git diff-index HEAD "**a"
 test_perf_on_all git diff-index --cached HEAD
+test_perf_on_all git check-attr -a -- $SPARSE_CONE/a
 
 test_done
